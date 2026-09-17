@@ -69,7 +69,7 @@ app.post('/api/enviar-confirmacoes', async (req, res) => {
       };
       saveConfirmacoes();
 
-      const baseUrl = process.env.BASE_URL || `http://localhost:${PORT}`;
+      const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
       const linkConfirmacao = `${baseUrl}/confirmar?id=${id}`;
       const linkRecusa = `${baseUrl}/recusar?id=${id}`;
 
