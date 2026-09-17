@@ -35,7 +35,10 @@ const transporter = nodemailer.createTransport({
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS
-  }
+  },
+  connectionTimeout: 10000,
+  greetingTimeout: 10000,
+  socketTimeout: 10000
 });
 
 app.get('/api/config-check', (req, res) => {
@@ -93,6 +96,7 @@ app.post('/api/enviar-confirmacoes', async (req, res) => {
       `;
 
       try {
+        await transporter.verify();
         await transporter.sendMail({
           from: process.env.SMTP_FROM || process.env.SMTP_USER,
           to: participante.email,
