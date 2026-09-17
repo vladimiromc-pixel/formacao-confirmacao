@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confirmação de Formação</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+    .container { max-width: 800px; margin: 0 auto; }
+    .header { text-align: center; color: white; margin-bottom: 30px; }
+    .header h1 { font-size: 2.5em; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
+    .header p { font-size: 1.1em; opacity: 0.9; }
+    .card { background: white; border-radius: 16px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; font-weight: 600; color: #2d3748; margin-bottom: 8px; font-size: 0.95em; }
+    .form-group input { width: 100%; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1em; transition: border-color 0.2s, box-shadow 0.2s; }
+    .form-group input:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .participantes-section { margin-top: 30px; }
+    .participantes-section h2 { color: #2d3748; margin-bottom: 15px; font-size: 1.3em; }
+    .participante-row { display: grid; grid-template-columns: 2fr 3fr auto; gap: 10px; margin-bottom: 10px; align-items: end; }
+    .participante-row input { width: 100%; padding: 10px 12px; border: 2px solid #e2e8f0; border-radius: 6px; font-size: 0.95em; }
+    .participante-row input:focus { outline: none; border-color: #667eea; }
+    .btn-add { background: #edf2f7; color: #4a5568; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-size: 0.95em; font-weight: 500; transition: background 0.2s; }
+    .btn-add:hover { background: #e2e8f0; }
+    .btn-remove { background: #fed7d7; color: #c53030; border: none; width: 36px; height: 36px; border-radius: 6px; cursor: pointer; font-size: 1.2em; transition: background 0.2s; }
+    .btn-remove:hover { background: #fc8181; color: white; }
+    .btn-enviar { width: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 16px; border-radius: 8px; font-size: 1.1em; font-weight: 600; cursor: pointer; margin-top: 20px; transition: transform 0.2s, box-shadow 0.2s; }
+    .btn-enviar:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4); }
+    .btn-enviar:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .btn-exportar { width: 100%; background: linear-gradient(135deg, #38a169 0%, #2f855a 100%); color: white; border: none; padding: 16px; border-radius: 8px; font-size: 1.1em; font-weight: 600; cursor: pointer; margin-top: 15px; transition: transform 0.2s, box-shadow 0.2s; }
+    .btn-exportar:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(56, 161, 105, 0.4); }
+    .resultado { margin-top: 20px; padding: 15px; border-radius: 8px; display: none; }
+    .resultado.sucesso { background: #c6f6d5; color: #276749; border: 1px solid #9ae6b4; }
+    .resultado.erro { background: #fed7d7; color: #c53030; border: 1px solid #fc8181; }
+    .resultado-item { padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.1); }
+    .resultado-item:last-child { border-bottom: none; }
+    .status-enviado { color: #276749; font-weight: 600; }
+    .status-erro { color: #c53030; font-weight: 600; }
+    .config-warning { background: #fffbeb; border: 1px solid #f6e05e; border-radius: 8px; padding: 15px; margin-bottom: 20px; color: #744210; display: none; }
+    .config-warning h3 { margin-bottom: 5px; }
+    #participantes-list { margin-bottom: 10px; }
+    .count-badge { background: #667eea; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.85em; margin-left: 8px; }
+    .export-section { margin-top: 30px; padding-top: 20px; border-top: 2px solid #e2e8f0; }
+    .export-section h2 { color: #2d3748; margin-bottom: 15px; font-size: 1.3em; }
+    .export-form { display: flex; gap: 10px; align-items: end; }
+    .export-form .form-group { flex: 1; margin-bottom: 0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Confirmação de Formação</h1>
+      <p>Pedido de confirmação de participação em formação</p>
+    </div>
+
+    <div class="card">
+      <div id="config-warning" class="config-warning">
+        <h3>⚠️ Configuração SMTP Pendente</h3>
+        <p>Para enviar emails, configure o ficheiro <code>.env</code> com as credenciais SMTP.</p>
+      </div>
+
+      <form id="formFormacao">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="formacao">Nome da Formação</label>
+            <input type="text" id="formacao" required placeholder="Ex: Segurança Informática">
+          </div>
+          <div class="form-group">
+            <label for="data">Data</label>
+            <input type="date" id="data" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="horas">Duração (horas)</label>
+            <input type="number" id="horas" required min="0.5" step="0.5" placeholder="Ex: 4">
+          </div>
+          <div class="form-group"></div>
+        </div>
+
+        <div class="participantes-section">
+          <h2>Participantes <span id="count-badge" class="count-badge">0</span></h2>
+          <div id="participantes-list"></div>
+          <button type="button" class="btn-add" onclick="adicionarParticipante()">+ Adicionar Participante</button>
+        </div>
+
+        <button type="submit" class="btn-enviar" id="btn-enviar">Enviar Pedido de Confirmação</button>
+      </form>
+
+      <div id="resultado" class="resultado"></div>
+
+      <div class="export-section">
+        <h2>Exportar Respostas</h2>
+        <div class="export-form">
+          <div class="form-group">
+            <label for="formacao-export">Formação (deixe vazio para exportar todas)</label>
+            <select id="formacao-export">
+              <option value="">Todas as formações</option>
+            </select>
+          </div>
+          <button type="button" class="btn-exportar" onclick="exportarExcel()">📥 Exportar para Excel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let participanteCount = 0;
+
+    function adicionarParticipante() {
+      participanteCount++;
+      const div = document.createElement('div');
+      div.className = 'participante-row';
+      div.id = `participante-${participanteCount}`;
+      div.innerHTML = `
+        <input type="text" placeholder="Nome" required class="nome">
+        <input type="email" placeholder="email@exemplo.pt" required class="email">
+        <button type="button" class="btn-remove" onclick="removerParticipante(${participanteCount})">×</button>
+      `;
+      document.getElementById('participantes-list').appendChild(div);
+      atualizarContador();
+    }
+
+    function removerParticipante(id) {
+      const el = document.getElementById(`participante-${id}`);
+      if (el) el.remove();
+      atualizarContador();
+    }
+
+    function atualizarContador() {
+      const count = document.querySelectorAll('.participante-row').length;
+      document.getElementById('count-badge').textContent = count;
+    }
+
+    document.getElementById('formFormacao').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const rows = document.querySelectorAll('.participante-row');
+      if (rows.length === 0) {
+        alert('Adicione pelo menos um participante');
+        return;
+      }
+
+      const participantes = [];
+      for (const row of rows) {
+        const nome = row.querySelector('.nome').value.trim();
+        const email = row.querySelector('.email').value.trim();
+        if (nome && email) {
+          participantes.push({ nome, email });
+        }
+      }
+
+      if (participantes.length === 0) {
+        alert('Preencha pelo menos um participante');
+        return;
+      }
+
+      const btn = document.getElementById('btn-enviar');
+      btn.disabled = true;
+      btn.textContent = 'A enviar...';
+
+      try {
+        const response = await fetch('/api/enviar-confirmacoes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            formacao: document.getElementById('formacao').value,
+            data: document.getElementById('data').value,
+            horas: document.getElementById('horas').value,
+            participantes
+          })
+        });
+
+        const result = await response.json();
+        const resultadoDiv = document.getElementById('resultado');
+
+        if (result.sucesso) {
+          resultadoDiv.className = 'resultado sucesso';
+          resultadoDiv.innerHTML = '<strong>Pedidos enviados!</strong><br>' +
+            result.resultados.map(r =>
+              `<div class="resultado-item">${r.nome} (${r.email}): <span class="status-${r.status}">${r.status === 'enviado' ? 'Enviado' : 'Erro: ' + r.erro}</span></div>`
+            ).join('');
+          carregarFormacoes();
+        } else {
+          resultadoDiv.className = 'resultado erro';
+          resultadoDiv.innerHTML = `<strong>Erro:</strong> ${result.error}`;
+        }
+        resultadoDiv.style.display = 'block';
+      } catch (error) {
+        const resultadoDiv = document.getElementById('resultado');
+        resultadoDiv.className = 'resultado erro';
+        resultadoDiv.innerHTML = `<strong>Erro de conexão:</strong> ${error.message}`;
+        resultadoDiv.style.display = 'block';
+      }
+
+      btn.disabled = false;
+      btn.textContent = 'Enviar Pedido de Confirmação';
+    });
+
+    async function carregarFormacoes() {
+      try {
+        const resp = await fetch('/api/formacoes');
+        const formacoes = await resp.json();
+        const select = document.getElementById('formacao-export');
+        select.innerHTML = '<option value="">Todas as formações</option>';
+        formacoes.forEach(f => {
+          const opt = document.createElement('option');
+          opt.value = f;
+          opt.textContent = f;
+          select.appendChild(opt);
+        });
+      } catch (e) {}
+    }
+
+    function exportarExcel() {
+      const formacao = document.getElementById('formacao-export').value;
+      let url = '/api/exportar-excel';
+      if (formacao) {
+        url += `?formacao=${encodeURIComponent(formacao)}`;
+      }
+      window.location.href = url;
+    }
+
+    async function verificarConfig() {
+      try {
+        const resp = await fetch('/api/config-check');
+        const config = await resp.json();
+        if (!config.configured) {
+          document.getElementById('config-warning').style.display = 'block';
+        }
+      } catch (e) {}
+    }
+
+    adicionarParticipante();
+    verificarConfig();
+    carregarFormacoes();
+  </script>
+</body>
+</html>
