@@ -1,6 +1,6 @@
 require('dotenv').config();
 const express = require('express');
-const sgMail = require('@sendgrid/mail');
+const nodemailer = require('nodemailer');
 const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
 const path = require('path');
@@ -28,12 +28,22 @@ function saveConfirmacoes() {
 
 loadConfirmacoes();
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST || 'smtp.office365.com',
+  port: parseInt(process.env.SMTP_PORT || '587'),
+  secure: false,
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS
+  },
+  tls: { rejectUnauthorized: false }
+});
 
 app.get('/api/config-check', (req, res) => {
   res.json({
-    configured: !!process.env.SENDGRID_API_KEY,
-    smtpUser: process.env.SENDGRID_API_KEY ? '***configurado***' : 'nao configurado'
+    configured: !!(process.env.SMTP_USER && process.env.SMTP_PASS),
+    smtpHost: process.env.SMTP_HOST || 'smtp.office365.com',
+    smtpUser: process.env.SMTP_USER ? '***configurado***' : 'nao configurado'
   });
 });
 
@@ -84,7 +94,7 @@ app.post('/api/enviar-confirmacoes', async (req, res) => {
       `;
 
       try {
-        await sgMail.send({
+        await transporter.sendMail({
           from: process.env.SMTP_FROM || process.env.SMTP_USER,
           to: participante.email,
           subject: `Confirmação: ${formacao} - ${data}`,
