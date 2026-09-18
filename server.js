@@ -39,9 +39,9 @@ app.get('/api/config-check', (req, res) => {
 
 app.post('/api/enviar-confirmacoes', async (req, res) => {
   try {
-    const { formacao, data, horas, participantes } = req.body;
+    const { formacao, data, horas, conteudo, participantes } = req.body;
 
-    if (!formacao || !data || !horas || !participantes || participantes.length === 0) {
+    if (!formacao || !data || !horas || !conteudo || !participantes || participantes.length === 0) {
       return res.status(400).json({ error: 'Dados incompletos' });
     }
 
@@ -53,6 +53,7 @@ app.post('/api/enviar-confirmacoes', async (req, res) => {
         formacao,
         data,
         horas,
+        conteudo,
         nome: participante.nome,
         email: participante.email,
         status: 'pendente',
@@ -66,18 +67,22 @@ app.post('/api/enviar-confirmacoes', async (req, res) => {
 
       const htmlContent = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #2c5282;">Confirmação de Participação em Formação</h2>
+          <h2 style="color: #003366;">Confirmação de Participação em Formação</h2>
           <p>Olá <strong>${participante.nome}</strong>,</p>
           <p>Por favor, confirme se participou na seguinte formação:</p>
-          <div style="background-color: #f7fafc; padding: 15px; border-radius: 8px; margin: 20px 0;">
+          <div style="background-color: #f0f7ff; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #0066cc;">
             <p style="margin: 5px 0;"><strong>Formação:</strong> ${formacao}</p>
             <p style="margin: 5px 0;"><strong>Data:</strong> ${data}</p>
             <p style="margin: 5px 0;"><strong>Duração:</strong> ${horas} horas</p>
           </div>
+          <div style="background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0;">
+            <p style="margin: 5px 0 10px 0;"><strong>Conteúdo Programático:</strong></p>
+            <p style="margin: 0; white-space: pre-line;">${conteudo}</p>
+          </div>
           <p>Responda indicando se participou ou não:</p>
           <div style="margin: 20px 0;">
-            <a href="${linkConfirmacao}" style="background-color: #38a169; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; margin-right: 10px;">Participei</a>
-            <a href="${linkRecusa}" style="background-color: #e53e3e; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px;">Não Participei</a>
+            <a href="${linkConfirmacao}" style="background-color: #0066cc; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; margin-right: 10px;">Participei</a>
+            <a href="${linkRecusa}" style="background-color: #cc0000; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px;">Não Participei</a>
           </div>
           <p style="color: #718096; font-size: 12px;">Este é um email automático. Por favor, não responda diretamente a este email.</p>
         </div>
@@ -114,7 +119,7 @@ app.get('/confirmar', (req, res) => {
 
   res.send(`
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; text-align: center;">
-      <h1 style="color: #38a169;">Participação Confirmada!</h1>
+      <h1 style="color: #0066cc;">Participação Confirmada!</h1>
       <p>A sua participação na formação <strong>${confirmacoes[id].formacao}</strong> foi registada com sucesso.</p>
       <p><strong>Data:</strong> ${confirmacoes[id].data}</p>
       <p>Obrigado pela sua resposta!</p>
@@ -134,7 +139,7 @@ app.get('/recusar', (req, res) => {
 
   res.send(`
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; text-align: center;">
-      <h1 style="color: #e53e3e;">Participação Não Confirmada</h1>
+      <h1 style="color: #cc0000;">Participação Não Confirmada</h1>
       <p>A sua resposta na formação <strong>${confirmacoes[id].formacao}</strong> foi registada.</p>
       <p>Se precisar de esclarecimentos, contacte o organizador.</p>
     </div>
@@ -164,6 +169,7 @@ app.get('/api/exportar-excel', (req, res) => {
     'Formação': c.formacao,
     'Data': c.data,
     'Horas': c.horas,
+    'Conteúdo': c.conteudo,
     'Nome': c.nome,
     'Email': c.email,
     'Estado': c.status === 'confirmado' ? 'Confirmou participação' : c.status === 'nao_confirmado' ? 'Não confirmou participação' : 'Pendente',

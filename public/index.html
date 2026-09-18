@@ -6,44 +6,45 @@
   <title>Confirmação de Formação</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #003366 0%, #0066cc 100%); min-height: 100vh; padding: 20px; }
     .container { max-width: 800px; margin: 0 auto; }
     .header { text-align: center; color: white; margin-bottom: 30px; }
     .header h1 { font-size: 2.5em; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
     .header p { font-size: 1.1em; opacity: 0.9; }
     .card { background: white; border-radius: 16px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
     .form-group { margin-bottom: 20px; }
-    .form-group label { display: block; font-weight: 600; color: #2d3748; margin-bottom: 8px; font-size: 0.95em; }
-    .form-group input { width: 100%; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1em; transition: border-color 0.2s, box-shadow 0.2s; }
-    .form-group input:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }
+    .form-group label { display: block; font-weight: 600; color: #003366; margin-bottom: 8px; font-size: 0.95em; }
+    .form-group input, .form-group textarea { width: 100%; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1em; transition: border-color 0.2s, box-shadow 0.2s; }
+    .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #0066cc; box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1); }
+    .form-group textarea { min-height: 120px; resize: vertical; }
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
     .participantes-section { margin-top: 30px; }
-    .participantes-section h2 { color: #2d3748; margin-bottom: 15px; font-size: 1.3em; }
+    .participantes-section h2 { color: #003366; margin-bottom: 15px; font-size: 1.3em; }
     .participante-row { display: grid; grid-template-columns: 2fr 3fr auto; gap: 10px; margin-bottom: 10px; align-items: end; }
     .participante-row input { width: 100%; padding: 10px 12px; border: 2px solid #e2e8f0; border-radius: 6px; font-size: 0.95em; }
-    .participante-row input:focus { outline: none; border-color: #667eea; }
-    .btn-add { background: #edf2f7; color: #4a5568; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-size: 0.95em; font-weight: 500; transition: background 0.2s; }
-    .btn-add:hover { background: #e2e8f0; }
+    .participante-row input:focus { outline: none; border-color: #0066cc; }
+    .btn-add { background: #e6f0ff; color: #003366; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-size: 0.95em; font-weight: 500; transition: background 0.2s; }
+    .btn-add:hover { background: #cce0ff; }
     .btn-remove { background: #fed7d7; color: #c53030; border: none; width: 36px; height: 36px; border-radius: 6px; cursor: pointer; font-size: 1.2em; transition: background 0.2s; }
     .btn-remove:hover { background: #fc8181; color: white; }
-    .btn-enviar { width: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 16px; border-radius: 8px; font-size: 1.1em; font-weight: 600; cursor: pointer; margin-top: 20px; transition: transform 0.2s, box-shadow 0.2s; }
-    .btn-enviar:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4); }
+    .btn-enviar { width: 100%; background: linear-gradient(135deg, #003366 0%, #0066cc 100%); color: white; border: none; padding: 16px; border-radius: 8px; font-size: 1.1em; font-weight: 600; cursor: pointer; margin-top: 20px; transition: transform 0.2s, box-shadow 0.2s; }
+    .btn-enviar:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 51, 102, 0.4); }
     .btn-enviar:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-    .btn-exportar { width: 100%; background: linear-gradient(135deg, #38a169 0%, #2f855a 100%); color: white; border: none; padding: 16px; border-radius: 8px; font-size: 1.1em; font-weight: 600; cursor: pointer; margin-top: 15px; transition: transform 0.2s, box-shadow 0.2s; }
-    .btn-exportar:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(56, 161, 105, 0.4); }
+    .btn-exportar { width: 100%; background: linear-gradient(135deg, #0066cc 0%, #004999 100%); color: white; border: none; padding: 16px; border-radius: 8px; font-size: 1.1em; font-weight: 600; cursor: pointer; margin-top: 15px; transition: transform 0.2s, box-shadow 0.2s; }
+    .btn-exportar:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 102, 204, 0.4); }
     .resultado { margin-top: 20px; padding: 15px; border-radius: 8px; display: none; }
-    .resultado.sucesso { background: #c6f6d5; color: #276749; border: 1px solid #9ae6b4; }
+    .resultado.sucesso { background: #e6f9e6; color: #006600; border: 1px solid #99cc99; }
     .resultado.erro { background: #fed7d7; color: #c53030; border: 1px solid #fc8181; }
     .resultado-item { padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.1); }
     .resultado-item:last-child { border-bottom: none; }
-    .status-enviado { color: #276749; font-weight: 600; }
+    .status-enviado { color: #006600; font-weight: 600; }
     .status-erro { color: #c53030; font-weight: 600; }
     .config-warning { background: #fffbeb; border: 1px solid #f6e05e; border-radius: 8px; padding: 15px; margin-bottom: 20px; color: #744210; display: none; }
     .config-warning h3 { margin-bottom: 5px; }
     #participantes-list { margin-bottom: 10px; }
-    .count-badge { background: #667eea; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.85em; margin-left: 8px; }
+    .count-badge { background: #0066cc; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.85em; margin-left: 8px; }
     .export-section { margin-top: 30px; padding-top: 20px; border-top: 2px solid #e2e8f0; }
-    .export-section h2 { color: #2d3748; margin-bottom: 15px; font-size: 1.3em; }
+    .export-section h2 { color: #003366; margin-bottom: 15px; font-size: 1.3em; }
     .export-form { display: flex; gap: 10px; align-items: end; }
     .export-form .form-group { flex: 1; margin-bottom: 0; }
   </style>
@@ -78,6 +79,11 @@
             <input type="number" id="horas" required min="0.5" step="0.5" placeholder="Ex: 4">
           </div>
           <div class="form-group"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="conteudo">Conteúdo da Formação</label>
+          <textarea id="conteudo" required placeholder="Descreva o conteúdo programático da formação..."></textarea>
         </div>
 
         <div class="participantes-section">
@@ -169,6 +175,7 @@
             formacao: document.getElementById('formacao').value,
             data: document.getElementById('data').value,
             horas: document.getElementById('horas').value,
+            conteudo: document.getElementById('conteudo').value,
             participantes
           })
         });
